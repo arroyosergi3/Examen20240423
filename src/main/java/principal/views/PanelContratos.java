@@ -3,13 +3,18 @@ package principal.views;
 import javax.swing.JPanel;
 import java.awt.GridBagLayout;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
+import java.awt.Toolkit;
+import java.util.Date;
 import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JTextField;
 
+import principal.controllers.ControladorContratos;
 import principal.controllers.ControladorUsuarios;
 import principal.entities.Contrato;
 
@@ -18,6 +23,12 @@ import principal.entities.Usuario;
 import javax.swing.JRadioButton;
 import javax.swing.ButtonGroup;
 import javax.swing.JComboBox;
+import javax.swing.JDialog;
+
+import java.awt.event.ActionListener;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.awt.event.ActionEvent;
 
 public class PanelContratos extends JPanel {
 
@@ -59,6 +70,7 @@ public class PanelContratos extends JPanel {
 		add(lblId, gbc_lblId);
 		
 		jtfId = new JTextField();
+		jtfId.setEnabled(false);
 		GridBagConstraints gbc_jtfId = new GridBagConstraints();
 		gbc_jtfId.gridwidth = 2;
 		gbc_jtfId.anchor = GridBagConstraints.NORTH;
@@ -143,6 +155,13 @@ public class PanelContratos extends JPanel {
 		add(jcbUsuario, gbc_jcbUsuario);
 		
 		JButton btnGestionarUsuario = new JButton("Gestionar Usuario");
+		btnGestionarUsuario.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Usuario u = (Usuario) jcbUsuario.getSelectedItem();
+				PanelDatosUsuario pdu = new PanelDatosUsuario(u);
+				abrirNuevoDialogo(pdu);
+			}
+		});
 		GridBagConstraints gbc_btnGestionarUsuario = new GridBagConstraints();
 		gbc_btnGestionarUsuario.insets = new Insets(0, 0, 5, 0);
 		gbc_btnGestionarUsuario.gridx = 2;
@@ -204,13 +223,114 @@ public class PanelContratos extends JPanel {
 		jtfFechaFirma.setColumns(10);
 		
 		JButton btnGuardar = new JButton("Guardar");
+		btnGuardar.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				guardar();
+			}
+		});
 		GridBagConstraints gbc_btnGuardar = new GridBagConstraints();
 		gbc_btnGuardar.insets = new Insets(0, 0, 0, 5);
 		gbc_btnGuardar.gridx = 1;
 		gbc_btnGuardar.gridy = 9;
 		add(btnGuardar, gbc_btnGuardar);
 		cargarTodosUsuarios();
+		mostrarContrato(c);
 
+	}
+	
+	public static Date deStringADate(String texto) {
+		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+
+		try {
+			Date fecha = sdf.parse(texto);
+			return fecha; // Si la cadena se puede parsear como fecha, entonces tiene el formato correcto
+		} catch (ParseException e) {
+			JOptionPane.showMessageDialog(null, "Error, la fecha no tiene un formato valido");
+			return null; // Si hay una excepción al parsear, significa que no tiene el formato correcto
+		}
+	}
+	
+	
+	private boolean minimo4caracteres() {
+		if (this.jtfDescripcion.getText().length() > 4) {
+			return true;
+		}
+		return false;
+	}
+	
+	private boolean isFloat(String str) {
+//		if (str.matches("[0-9]{}[.][0-9]{}")) {
+//			return true;
+//		}
+//		return false;
+		
+		try {
+			Float.parseFloat(str);
+			return true;
+		} catch (Exception e) {
+			return false;
+		}
+	}
+	
+	public static String dateToString(Date fecha) {
+		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+		return sdf.format(fecha);
+	}
+	
+	private void guardar() {
+		if (minimo4caracteres()) {
+			if (isFloat(this.jtfSaldo.getText())) {
+				if (isFloat(this.jtfLimite.getText())) {
+
+					
+					Contrato c = (Contrato) ControladorContratos.getInstance().findById(Integer.valueOf(this.jtfId.getText()));
+					
+					c.setDescripcion(this.jtfDescripcion.getText());
+					c.setLimite(Float.valueOf(this.jtfLimite.getText()));
+					c.setSaldo(Float.valueOf(this.jtfSaldo.getText()));
+					
+					if (this.jrdCuentaBancaria.isSelected()) {
+						c.setIdTipoContrato(1);
+					}
+					if (this.jrbTarjetaDebito.isSelected()) {
+						c.setIdTipoContrato(2);
+					}
+					if (this.jrbTarjetaCredito.isSelected()) {
+						c.setIdTipoContrato(3);
+					}
+					if (this.jrbPrestamo.isSelected()) {
+						c.setIdTipoContrato(4);
+					}
+					
+					c.setFechaFirma(deStringADate(this.jtfFechaFirma.getText()));
+					ControladorContratos.getInstance().update(c);
+					JOptionPane.showMessageDialog(null, "Registro modificado con éxtio");
+					mostrarContrato(c);
+					
+					
+					
+					
+				}
+				else {
+					JOptionPane.showMessageDialog(null, "Error, el limite no es valida");
+
+				}
+				
+			}
+			else {
+				JOptionPane.showMessageDialog(null, "Error, el saldo no es valida");
+
+			}
+			
+			
+			
+			
+			
+		}
+		else {
+			JOptionPane.showMessageDialog(null, "Error, la descripcion no es valida");
+		}
+		
 	}
 	
 	
@@ -232,7 +352,7 @@ public class PanelContratos extends JPanel {
 		selUsuario(c);
 		this.jtfSaldo.setText(String.valueOf(c.getSaldo()));
 		this.jtfLimite.setText(String.valueOf(c.getLimite()));
-		this.jtfFechaFirma.setText(String.valueOf(c.getFechaFirma()));
+		this.jtfFechaFirma.setText(dateToString(c.getFechaFirma()));
 		
 		
 		
@@ -252,6 +372,25 @@ public class PanelContratos extends JPanel {
 			this.jcbUsuario.addItem(proveedor);
 			;
 		}
+	}
+	
+	public void abrirNuevoDialogo(JPanel panel) {
+		JDialog dialogo = new JDialog();
+		// El usuario no puede redimensionar el di�logo
+		dialogo.setResizable(true);
+		// t�tulo del d�alogo
+		dialogo.setTitle("Gestión de Usuarios");
+		// Introducimos el panel creado sobre el di�logo
+		dialogo.setContentPane(panel);
+		// Empaquetar el di�logo hace que todos los componentes ocupen el espacio que deben y el lugar adecuado
+		dialogo.pack();
+		// El usuario no puede hacer clic sobre la ventana padre, si el Di�logo es modal
+		dialogo.setModal(true);
+		// Centro el di�logo en pantalla
+		dialogo.setLocation((Toolkit.getDefaultToolkit().getScreenSize().width)/2 - dialogo.getWidth()/2, 
+				(Toolkit.getDefaultToolkit().getScreenSize().height)/2 - dialogo.getHeight()/2);
+		// Muestro el di�logo en pantalla
+		dialogo.setVisible(true);
 	}
 
 }

@@ -60,32 +60,32 @@ public class SuperControlador {
 	}
 	
 	public Entidad findById(int id) {
-		Entidad e = (Entidad) em.find(Entidad.class, id);
+		Entidad e = (Entidad) em.find(this.tipoEntidad, id);
 		return e;
 	}
 
 	public Entidad getPrimero() {
 
-		Entidad e = (Entidad) em.find(Entidad.class, minIdEnTabla());
+		Entidad e = (Entidad) em.find(this.tipoEntidad, minIdEnTabla());
 
 		return e;
 
 	}
 
 	public Entidad getUltimo() {
-		Entidad e = (Entidad) em.find(Entidad.class, maxIdEnTabla());
+		Entidad e = (Entidad) em.find(this.tipoEntidad, maxIdEnTabla());
 
 		return e;
 	}
 
 	private int minIdEnTabla() {
-		Query q = em.createNativeQuery("SELECT min() FROM " + nombreTabla + ";", Entidad.class);
+		Query q = em.createNativeQuery("SELECT min() FROM " + nombreTabla + ";", this.tipoEntidad);
 		int minId = (int) q.getSingleResult();
 		return minId;
 	}
 
 	private int maxIdEnTabla() {
-		Query q = em.createNativeQuery("SELECT max() FROM " + nombreTabla + ";", Entidad.class);
+		Query q = em.createNativeQuery("SELECT max() FROM " + nombreTabla + ";", this.tipoEntidad);
 		int maxId = (int) q.getSingleResult();
 		return maxId;
 	}

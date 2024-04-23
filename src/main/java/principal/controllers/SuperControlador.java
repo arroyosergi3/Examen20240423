@@ -18,7 +18,7 @@ public class SuperControlador {
 
 	protected EntityManager getEntityManager() {
 		if (em == null) {
-			em = Persistence.createEntityManagerFactory("CentroEducativo").createEntityManager();
+			em = Persistence.createEntityManagerFactory("Bankonter").createEntityManager();
 		}
 		return em;
 	}

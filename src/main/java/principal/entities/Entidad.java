@@ -1,11 +1,13 @@
 package principal.entities;
 
-public  class Entidad {
+
+public abstract class Entidad {
 	
 	
 	public Entidad() {
 		super();
 	}
 	
+	public abstract int getId();
 
 }

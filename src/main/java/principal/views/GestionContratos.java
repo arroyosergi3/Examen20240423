@@ -1,40 +1,40 @@
 package principal.views;
 
-import javax.swing.JPanel;
-import javax.swing.JSplitPane;
 import java.awt.BorderLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
+import principal.controllers.ControladorContratos;
 import principal.controllers.DatosDeTabla;
+import principal.entities.Contrato;
 
-
-public class PanelEjemplo extends JPanel {
+public class GestionContratos extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 	private JTable table;
 	private DefaultTableModel dtm = null;
 	private Object datosEnTabla[][] = DatosDeTabla.getDatosDeTabla();
 	private String titulosEnTabla[] = DatosDeTabla.getTitulosColumnas();
-	private static PanelEjemplo instance = null;
+	private static GestionContratos instance = null;
 	
-	public static PanelEjemplo getInstance() {
+	public static GestionContratos getInstance() {
 		if (instance == null) {
-			instance = new PanelEjemplo();
+			instance = new GestionContratos();
 		}
 		
 		return instance;
 	}
-	
 
 	/**
 	 * Create the panel.
 	 */
-	public PanelEjemplo() {
+	public GestionContratos() {
 		setLayout(new BorderLayout(0, 0));
 		
 		JSplitPane splitPane = new JSplitPane();
@@ -44,13 +44,12 @@ public class PanelEjemplo extends JPanel {
 		JScrollPane scrollPane = new JScrollPane();
 		splitPane.setLeftComponent(scrollPane);
 		
-		table = new JTable();
-		scrollPane.setViewportView(table);
+		
 		
 		
 		this.dtm = getDefaultTableModelNoEditable();
 		table = new JTable(dtm);
-		
+		scrollPane.setViewportView(table);
 		
 		
 		table.addMouseListener(new MouseAdapter() {
@@ -62,13 +61,13 @@ public class PanelEjemplo extends JPanel {
 				Object value = datosEnTabla[indiceFilaSel][0];
 				
 				//OBTENER EL OBJETO SELECCIONADO
-				Estudiante estSeleccionado = ControladorEstudiantes.getInstance().obtenerEstudiantePorId((Integer)value);
+				Contrato con = (Contrato) ControladorContratos.getInstance().findById((Integer)value);
 				
 				//MOSTRAR EL OBEJTO
-				ControladorEstudiantes.getInstance().mostrarEstudiante(estSeleccionado);
+//				ControladorContratos.getInstance().mostrarEstudiante(estSeleccionado);
 				
 				//CREAR EL PANEL CORRESPONDIENTE Y AÑADIRLO
-				PanelEStudiante panelEstudiante = new PanelEStudiante(estSeleccionado);
+				PanelContratos panelEstudiante = new PanelContratos(con);
 				JScrollPane scrollPane2 = new JScrollPane(panelEstudiante);
 				splitPane.setRightComponent(scrollPane2);
 				splitPane.setResizeWeight(0.2);

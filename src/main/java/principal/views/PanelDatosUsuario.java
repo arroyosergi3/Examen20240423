@@ -11,11 +11,13 @@ import java.awt.Insets;
 import javax.swing.JComboBox;
 import javax.swing.JTextField;
 
+import principal.controllers.ControladorUsuarios;
 import principal.entities.Usuario;
 
 import javax.swing.JPasswordField;
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
+import java.util.regex.Pattern;
 import java.awt.event.ActionEvent;
 
 public class PanelDatosUsuario extends JPanel {
@@ -148,8 +150,32 @@ public class PanelDatosUsuario extends JPanel {
 
 	}
 	
+	
+//	Greedy quantifiers
+//	X?	X, once or not at all
+//	X*	X, zero or more times
+//	X+	X, one or more times
+//	X{n}	X, exactly n times
+//	X{n,}	X, at least n times
+//	X{n,m}	X, at least n but not more than m times
+//	Reluctant quantifiers
+//	X??	X, once or not at all
+//	X*?	X, zero or more times
+//	X+?	X, one or more times
+//	X{n}?	X, exactly n times
+//	X{n,}?	X, at least n times
+//	X{n,m}?	X, at least n but not more than m times
+//	Possessive quantifiers
+//	X?+	X, once or not at all
+//	X*+	X, zero or more times
+//	X++	X, one or more times
+//	X{n}+	X, exactly n times
+//	X{n,}+	X, at least n times
+//	X{n,m}+	X, at least n but not more than m times
+
+	
 	private boolean isEmailvalido() {
-		if (this.jtfEmail.getText().matches("/d{+}[@]/d{+}[.]/d{+}")) {
+		if (this.jtfEmail.getText().matches(".+[@].+[.].+")) {
 			return true;
 		}
 		return false;
@@ -160,6 +186,20 @@ public class PanelDatosUsuario extends JPanel {
 		if (!this.jtfUsuario.getText().isEmpty()) {
 			if (!this.jpfContraseña.getText().isEmpty()) {
 				if (isEmailvalido()) {
+					
+					Usuario u = (Usuario) ControladorUsuarios.getInstance().findById(Integer.valueOf(this.jtfId.getText()));
+					
+					u.setEmail(this.jtfEmail.getText());
+					u.setColorPreferido(this.jcbColorPreferido.getSelectedItem().toString());
+					u.setNombreUsuario(this.jtfUsuario.getText());
+					u.setPassword(this.jpfContraseña.getText());
+					
+					ControladorUsuarios.getInstance().update(u);
+					JOptionPane.showMessageDialog(null, "Usuario modificado con éxito");
+					mostrardatos(u);
+					PanelContratos.cargarTodosUsuarios();
+					
+					
 					
 				}
 				else {
